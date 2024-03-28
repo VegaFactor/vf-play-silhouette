@@ -19,7 +19,8 @@
  */
 package play.silhouette.api.services
 
-import play.silhouette.api.{ Identity, LoginInfo }
+import play.api.mvc.RequestHeader
+import play.silhouette.api.{Identity, LoginInfo}
 
 import scala.concurrent.Future
 
@@ -34,5 +35,5 @@ trait IdentityService[T <: Identity] {
    * @param loginInfo The login info to retrieve an identity.
    * @return The retrieved identity or None if no identity could be retrieved for the given login info.
    */
-  def retrieve(loginInfo: LoginInfo): Future[Option[T]]
+  def retrieve(loginInfo: LoginInfo)(implicit request: RequestHeader): Future[Option[T]]
 }

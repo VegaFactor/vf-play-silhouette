@@ -36,7 +36,7 @@ class BasicAuthProviderSpec extends PasswordProviderSpec {
       override def running() = {
         val passwordInfo = PasswordInfo("unknown", "hashed(s3cr3t)")
         val loginInfo = LoginInfo(provider.id, credentials.identifier)
-        val request = FakeRequest().withHeaders(AUTHORIZATION -> encodeCredentials(credentials))
+        implicit val request = FakeRequest().withHeaders(AUTHORIZATION -> encodeCredentials(credentials))
 
         when(authInfoRepository.find[PasswordInfo](loginInfo)).thenReturn(Future.successful(Some(passwordInfo)))
 
@@ -49,7 +49,7 @@ class BasicAuthProviderSpec extends PasswordProviderSpec {
     "return None if no auth info could be found for the given credentials" in new WithApplication with Context {
       override def running() = {
         val loginInfo = new LoginInfo(provider.id, credentials.identifier)
-        val request = FakeRequest().withHeaders(AUTHORIZATION -> encodeCredentials(credentials))
+        implicit val request = FakeRequest().withHeaders(AUTHORIZATION -> encodeCredentials(credentials))
 
         when(authInfoRepository.find[PasswordInfo](loginInfo)).thenReturn(Future.successful(None))
 
@@ -61,7 +61,7 @@ class BasicAuthProviderSpec extends PasswordProviderSpec {
       override def running() = {
         val passwordInfo = PasswordInfo("foo", "hashed(s3cr3t)")
         val loginInfo = LoginInfo(provider.id, credentials.identifier)
-        val request = FakeRequest().withHeaders(AUTHORIZATION -> encodeCredentials(credentials))
+        implicit val request = FakeRequest().withHeaders(AUTHORIZATION -> encodeCredentials(credentials))
 
         when(fooHasher.matches(passwordInfo, credentials.password)).thenReturn(false)
         when(authInfoRepository.find[PasswordInfo](loginInfo)).thenReturn(Future.successful(Some(passwordInfo)))
@@ -88,7 +88,7 @@ class BasicAuthProviderSpec extends PasswordProviderSpec {
       override def running() = {
         val passwordInfo = PasswordInfo("foo", "hashed(s3cr3t)")
         val loginInfo = LoginInfo(provider.id, credentials.identifier)
-        val request = FakeRequest().withHeaders(AUTHORIZATION -> encodeCredentials(credentials))
+        implicit val request = FakeRequest().withHeaders(AUTHORIZATION -> encodeCredentials(credentials))
 
         when(fooHasher.matches(passwordInfo, credentials.password)).thenReturn(true)
         when(authInfoRepository.find[PasswordInfo](loginInfo)).thenReturn(Future.successful(Some(passwordInfo)))
@@ -102,7 +102,7 @@ class BasicAuthProviderSpec extends PasswordProviderSpec {
         val credentialsWithColon = Credentials("apollonia.vanova@watchmen.com", "s3c:r3t")
         val passwordInfo = PasswordInfo("foo", "hashed(s3c:r3t)")
         val loginInfo = LoginInfo(provider.id, credentialsWithColon.identifier)
-        val request = FakeRequest().withHeaders(AUTHORIZATION -> encodeCredentials(credentialsWithColon))
+        implicit val request = FakeRequest().withHeaders(AUTHORIZATION -> encodeCredentials(credentialsWithColon))
 
         when(fooHasher.matches(passwordInfo, credentialsWithColon.password)).thenReturn(true)
         when(authInfoRepository.find[PasswordInfo](loginInfo)).thenReturn(Future.successful(Some(passwordInfo)))
@@ -115,7 +115,7 @@ class BasicAuthProviderSpec extends PasswordProviderSpec {
       override def running() = {
         val passwordInfo = PasswordInfo("bar", "hashed(s3cr3t)")
         val loginInfo = LoginInfo(provider.id, credentials.identifier)
-        val request = FakeRequest().withHeaders(AUTHORIZATION -> encodeCredentials(credentials))
+        implicit val request = FakeRequest().withHeaders(AUTHORIZATION -> encodeCredentials(credentials))
 
         when(fooHasher.hash(credentials.password)).thenReturn(passwordInfo)
         when(barHasher.matches(passwordInfo, credentials.password)).thenReturn(true)
@@ -131,7 +131,7 @@ class BasicAuthProviderSpec extends PasswordProviderSpec {
       override def running() = {
         val passwordInfo = PasswordInfo("foo", "hashed(s3cr3t)")
         val loginInfo = LoginInfo(provider.id, credentials.identifier)
-        val request = FakeRequest().withHeaders(AUTHORIZATION -> encodeCredentials(credentials))
+        implicit val request = FakeRequest().withHeaders(AUTHORIZATION -> encodeCredentials(credentials))
 
         when(fooHasher.isDeprecated(passwordInfo)).thenReturn(Some(true))
         when(fooHasher.hash(credentials.password)).thenReturn(passwordInfo)

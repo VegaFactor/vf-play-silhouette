@@ -26,6 +26,9 @@ import org.mockito.Mockito._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
+import play.api.mvc.Request
+import play.api.test.FakeRequest
+
 /**
  * Test case for the [[play.silhouette.impl.providers.CredentialsProvider]] class.
  */
@@ -119,6 +122,11 @@ class CredentialsProviderSpec extends PasswordProviderSpec {
    * The context.
    */
   trait Context extends BaseContext {
+
+    /**
+     * The implicit request.
+     */
+    implicit val request: Request[_] = FakeRequest()
 
     /**
      * The test credentials.

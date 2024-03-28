@@ -15,9 +15,10 @@
  */
 package play.silhouette.impl.providers
 
+import play.api.mvc.RequestHeader
 import play.silhouette.api.repositories.AuthInfoRepository
-import play.silhouette.api.util.{ ExecutionContextProvider, PasswordHasherRegistry, PasswordInfo }
-import play.silhouette.api.{ LoginInfo, Provider }
+import play.silhouette.api.util.{ExecutionContextProvider, PasswordHasherRegistry, PasswordInfo}
+import play.silhouette.api.{LoginInfo, Provider}
 import play.silhouette.impl.providers.PasswordProvider._
 
 import scala.concurrent.Future
@@ -69,7 +70,7 @@ trait PasswordProvider extends Provider with ExecutionContextProvider {
    * @param password The user password to authenticate with.
    * @return The authentication state.
    */
-  def authenticate(loginInfo: LoginInfo, password: String): Future[State] = {
+  def authenticate(loginInfo: LoginInfo, password: String)(implicit request: RequestHeader): Future[State] = {
     authInfoRepository.find[PasswordInfo](loginInfo).flatMap {
       case Some(passwordInfo) => passwordHasherRegistry.find(passwordInfo) match {
         case Some(hasher) if hasher.matches(passwordInfo, password) =>

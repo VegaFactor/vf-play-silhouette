@@ -15,16 +15,15 @@
  */
 package play.silhouette.persistence.repositories
 
-import com.google.inject.{ AbstractModule, Guice, Provides }
+import com.google.inject.{AbstractModule, Guice, Provides}
 import play.silhouette.api.exceptions.ConfigurationException
 import play.silhouette.api.repositories.AuthInfoRepository
 import play.silhouette.api.util.PasswordInfo
-import play.silhouette.api.{ AuthInfo, LoginInfo }
-import play.silhouette.impl.providers.{ OAuth1Info, OAuth2Info }
-import play.silhouette.persistence.daos.{ DelegableAuthInfoDAO, InMemoryAuthInfoDAO }
+import play.silhouette.api.{AuthInfo, LoginInfo}
+import play.silhouette.impl.providers.{OAuth1Info, OAuth2Info}
+import play.silhouette.persistence.daos.{DelegableAuthInfoDAO, InMemoryAuthInfoDAO}
 import play.silhouette.persistence.repositories.DelegableAuthInfoRepository._
 import play.silhouette.test.WaitPatience
-import net.codingwell.scalaguice.ScalaModule
 import org.specs2.concurrent.ExecutionEnv
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
@@ -33,6 +32,10 @@ import org.mockito.Mockito._
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.language.postfixOps
+
+import play.api.test.FakeRequest
+
+import net.codingwell.scalaguice.ScalaModule
 
 /**
  * Test case for the [[DelegableAuthInfoRepository]] trait.
@@ -230,6 +233,8 @@ class DelegableAuthInfoRepositorySpec(implicit ev: ExecutionEnv)
     lazy val passwordInfoDAO = spy(new PasswordInfoDAO)
     lazy val oauth1InfoDAO = spy(new OAuth1InfoDAO)
     lazy val oauth2InfoDAO = spy(new OAuth2InfoDAO)
+
+    implicit val request = FakeRequest()  // Need to fix Cannot find any HTTP Request Header here
 
     /**
      * The cache instance to store the different auth information instances.

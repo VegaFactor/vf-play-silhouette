@@ -11,10 +11,13 @@ val sonatypeProfile = "org.playframework"
 val previousVersion: Option[String] = None // Some("0.8.0")
 
 val commonSettings = Seq(
+  githubOwner := "VegaFactor",
+  githubRepository := "play-silhouette",
+  githubTokenSource := TokenSource.Environment("GITHUB_TOKEN") || TokenSource.GitConfig("github.token"),
+
   sonatypeProfileName := sonatypeProfile,
   mimaPreviousArtifacts := previousVersion.map(organization.value %% moduleName.value % _).toSet,
-  mimaBinaryIssueFilters ++= Seq(
-  )
+  mimaBinaryIssueFilters ++= Seq()
 )
 
 // Customise sbt-dynver's behaviour to make it work with tags which aren't v-prefixed
@@ -32,10 +35,11 @@ ThisBuild / homepage := Some(url("https://silhouette.readme.io/"))
 ThisBuild / licenses := Seq("Apache License" -> url("https://github.com/playframework/play-silhouette/blob/main/LICENSE"))
 ThisBuild / Test / publishArtifact := false
 ThisBuild / pomIncludeRepository := { _ => false }
-ThisBuild / organization := "org.playframework.silhouette"
-ThisBuild / organizationName := "The Play Framework Project"
+ThisBuild / organization := "com.vegafactor"
+ThisBuild / organizationName := "Vega Factor (silhouette)"
+ThisBuild / version := "9.x-vf01"
 ThisBuild / scalaVersion := scala213
-ThisBuild / versionScheme := Some("early-semver")
+//ThisBuild / versionScheme := Some("early-semver")
 ThisBuild / scalacOptions ++= Seq(
   "-feature",
   "-Xfatal-warnings"
@@ -78,6 +82,9 @@ ThisBuild / developers ++= List(
     url("https://github.com/MathisGuillet1")
   ),
 )
+
+publishConfiguration := publishConfiguration.value.withOverwrite(true)
+publishLocalConfiguration := publishLocalConfiguration.value.withOverwrite(true)
 
 lazy val root = (project in file("."))
   .disablePlugins(MimaPlugin)
@@ -194,7 +201,8 @@ lazy val silhouettePersistence = (project in file("silhouette-persistence"))
         Library.Specs2.core % Test,
         Library.Specs2.matcherExtra % Test,
         Library.mockito % Test,
-        Library.scalaGuice % Test
+        Library.scalaGuice % Test,
+        Library.Play.test % Test,
       )
   )
   .dependsOn(silhouette)

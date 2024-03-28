@@ -15,6 +15,7 @@
  */
 package play.silhouette.impl.providers.oauth2
 
+import play.silhouette.api.Logger
 import play.silhouette.api.LoginInfo
 import play.silhouette.api.util.HTTPLayer
 import play.silhouette.impl.exceptions.ProfileRetrievalException
@@ -73,8 +74,10 @@ trait BaseAuth0Provider extends OAuth2Provider {
     val request = httpLayer.url(urls("api"))
     val requestWithHeader = request.withHttpHeaders(("Authorization", s"Bearer ${authInfo.accessToken}"))
 
+    logger.debug("[Silhouette][%s] Requesting userinfo from: %s".format(id, request))
     val httpResponse = requestWithHeader.get()
     httpResponse.flatMap { response =>
+      logger.debug("[Silhouette][%s] Received userinfo from: %s -- %s".format(id, request, response))
       response.status match {
         case Http.Status.OK =>
           profileParser.parse(response.json, authInfo)
@@ -111,7 +114,7 @@ trait BaseAuth0Provider extends OAuth2Provider {
 /**
  * The profile parser for the common social profile.
  */
-class Auth0ProfileParser extends SocialProfileParser[JsValue, CommonSocialProfile, OAuth2Info] {
+class Auth0ProfileParser extends SocialProfileParser[JsValue, CommonSocialProfile, OAuth2Info] with Logger {
 
   /**
    * Parses the social profile.
@@ -120,16 +123,33 @@ class Auth0ProfileParser extends SocialProfileParser[JsValue, CommonSocialProfil
    * @return The social profile from given result.
    */
   override def parse(json: JsValue, authInfo: OAuth2Info): Future[CommonSocialProfile] = Future.successful {
-    val userID = (json \ "sub").as[String]
-    val fullName = (json \ "name").asOpt[String]
-    val avatarURL = (json \ "picture").asOpt[String]
-    val email = (json \ "email").asOpt[String]
+    logger.debug("[Silhouette][Auth0ProfileParser] parsing: %s ( %s )".format(json, authInfo))
 
-    CommonSocialProfile(
-      loginInfo = LoginInfo(ID, userID),
-      fullName = fullName,
-      avatarURL = avatarURL,
-      email = email)
+    /*  The full JSON returned by Auth0 (when using OKTA as Identity Provider) looks like this
+    {
+            "sub":"oidc|OKTA-FACTOR-DEV|00u2gvojgso4PlKDp5d7",
+            "given_name":"Aakash",
+            "family_name":"Aaberg",
+            "nickname":"aa1",
+            "preferred_username":"aa1@client.baz",
+            "name":"Aakash Aaberg",
+            "picture":"https://s.gravatar.com/avatar/28f7ceedd4f0e7765a162d03c624815c?s=480&r=pg&d=https%3A%2F%2Fcdn.auth0.com%2Favatars%2Faa.png",
+            "zoneinfo":"America/Los_Angeles",
+            "locale":"en-US",
+            "updated_at":"2021-11-03T16:30:22.099Z",
+            "email":"aa1@client.baz",
+            "email_verified":true
+    }
+     */
+
+    val userID = (json \ "sub").as[String]
+
+    CommonSocialProfile( loginInfo = LoginInfo(ID, userID),
+                         firstName = (json \ "given_name").asOpt[String],
+                         lastName  = (json \ "family_name").asOpt[String],
+                         fullName  = (json \ "name").asOpt[String],
+                         avatarURL = (json \ "picture").asOpt[String],
+                         email     = (json \ "email").asOpt[String] )
   }
 }
 
