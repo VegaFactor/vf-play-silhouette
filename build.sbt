@@ -15,20 +15,20 @@ val commonSettings = Seq(
   githubRepository := "play-silhouette",
   githubTokenSource := TokenSource.Environment("GITHUB_TOKEN") || TokenSource.GitConfig("github.token"),
 
-  sonatypeProfileName := sonatypeProfile,
+//  sonatypeProfileName := sonatypeProfile,
   mimaPreviousArtifacts := previousVersion.map(organization.value %% moduleName.value % _).toSet,
   mimaBinaryIssueFilters ++= Seq()
 )
 
 // Customise sbt-dynver's behaviour to make it work with tags which aren't v-prefixed
-ThisBuild / dynverVTagPrefix := false
+//ThisBuild / dynverVTagPrefix := false
 
 // Sanity-check: assert that version comes from a tag (e.g. not a too-shallow clone)
 // https://github.com/dwijnand/sbt-dynver/#sanity-checking-the-version
-Global / onLoad := (Global / onLoad).value.andThen { s =>
-  dynverAssertTagVersion.value
-  s
-}
+//Global / onLoad := (Global / onLoad).value.andThen { s =>
+//  dynverAssertTagVersion.value
+//  s
+//}
 
 ThisBuild / description := "Authentication library for Play Framework applications that supports several authentication methods, including OAuth1, OAuth2, OpenID, CAS, Credentials, Basic Authentication, Two Factor Authentication or custom authentication schemes"
 ThisBuild / homepage := Some(url("https://silhouette.readme.io/"))
@@ -101,7 +101,7 @@ lazy val root = (project in file("."))
   .enablePlugins(ScalaUnidocPlugin)
   .settings(
     name := "play-silhouette-root",
-    sonatypeProfileName := sonatypeProfile,
+//    sonatypeProfileName := sonatypeProfile,
     Defaults.coreDefaultSettings,
     publish / skip := true,
   )
